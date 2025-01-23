@@ -1,0 +1,125 @@
+<style>
+  .color-swatch:hover {
+    transform: scale(1.18);
+}
+  label.color-swatch {
+    border: 1px solid #ddd !important;
+}
+.product-form__input input[type=radio]:checked+label.color-swatch{
+   border-color:#000 !important;
+}
+label:not(.color-swatch) {
+    border-radius: 25px !important;
+    background: white !important;
+    color: grey !important;
+    border: 1px solid #fff !important;
+    webkit-transition: 0.3s all ease-in-out !important;
+    transition: 0.3s all ease-in-out !important;
+      font-size: 13px !important;
+    padding: 0 !important;
+    width: 48px;
+    height: 34px;
+    display: inline-block;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-form__input input[type=radio]:checked+label:not(.color-swatch) {
+    background: white;
+   color: black !important;
+   border-color: #292929 !important;
+}
+
+.product-form__input input[type=radio]:not(:checked)+label:not(.color-swatch):hover {
+    border-color: #cfcfcf !important;
+    box-shadow: 2px 14px 13px -3px #cfcfcf70 !important;
+}
+  .cus_flex_column {
+    text-align: left;
+    padding-bottom:10px;
+}
+</style>
+{%- liquid
+  assign variants_available_arr = product.variants | map: 'available'
+  assign variants_option1_arr = product.variants | map: 'option1'
+  assign variants_option2_arr = product.variants | map: 'option2'
+  assign variants_option3_arr = product.variants | map: 'option3'
+
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+{%- for value in option.values -%}
+  {%- liquid
+    assign option_disabled = true
+    assign variant_image = ''
+
+    for option1_name in variants_option1_arr
+      case option.position
+        when 1
+          if variants_option1_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+            assign variant_image = product.variants[forloop.index0].image
+          endif
+        when 2
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+            assign variant_image = product.variants[forloop.index0].image
+          endif
+        when 3
+          if option1_name == product.selected_or_first_available_variant.option1 and variants_option2_arr[forloop.index0] == product.selected_or_first_available_variant.option2 and variants_option3_arr[forloop.index0] == value and variants_available_arr[forloop.index0]
+            assign option_disabled = false
+            assign variant_image = product.variants[forloop.index0].image
+          endif
+      endcase 
+endfor
+  -%}
+  {%- if block.settings.picker_type == 'button' -%}
+    <input
+      type="radio"
+      id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+      name="{{ option.name }}"
+      value="{{ value | escape }}"
+      form="{{ product_form_id }}"
+      {% if option.selected_value == value %}
+        checked
+      {% endif %}
+      {% if option_disabled %}
+        class="disabled"
+      {% endif %}
+    >
+    <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" 
+      {% if option.name == 'Farbe' or option.name == 'farbe' or option.name == 'Farben' or option.name == 'farben' or option.name == 'color' or option.name == 'Color' or option.name == 'colors' or option.name == 'Colors'%}
+        style="background-image:url({{ variant_image | img_url: 'compact' }});
+    border-radius: 8px;
+    background-color: #fff;
+    width: 52px;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    height: 85px;
+    -webkit-transition: 0.3s all ease-in-out !important;
+    transition: 0.3s all ease-in-out !important;"
+        class="color-swatch"
+      {% endif %}>
+      {% if option.name == 'Farbe' or option.name == 'farbe' or option.name == 'Farben' or option.name == 'farben' or option.name == 'color' or option.name == 'Color' or option.name == 'colors' or option.name == 'Colors'%}
+        <span class="visually-hidden">{{ value }}</span>
+      {% else %}
+        {{ value }}
+      {% endif %}
+    </label>
+  {%- elsif block.settings.picker_type == 'dropdown' -%}
+    <option
+      value="{{ value | escape }}"
+      {% if option.selected_value == value %}
+        selected="selected"
+      {% endif %}
+    >
+      {% if option_disabled -%}
+        {{- 'products.product.value_unavailable' | t: option_value: value -}}
+      {%- else -%}
+        {{- value -}}
+      {%- endif %}
+    </option>
+  {%- endif -%}
+{%- endfor -%}
