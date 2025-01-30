@@ -1,0 +1,14 @@
+<breadcrumbs>
+<ul>
+<li><a style="
+text-decoration: none;color: #8a8a83!important;" href="/">Home</a></li>
+<divider style="
+text-decoration: none;color: #8a8a83!important;">/</divider>
+<li><a style="
+text-decoration: none;color: #8a8a83!important;" href="/collections">Collecties</a></li>
+<divider style="
+text-decoration: none;color: #8a8a83!important;">/</divider>
+<li><a style="    
+text-decoration: none;color: black;" href="/collections">{{ collection.title }}</a></li>
+</ul>
+</breadcrumbs>
